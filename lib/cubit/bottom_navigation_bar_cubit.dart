@@ -18,7 +18,7 @@ class cubit_bottom_navigation_bar extends Cubit<Status_bottom_navigation_bar> {
   List<Widget> Screens = [
     const HomePage(),
     const OrdersOfUser(),
-    const ProfileOfUser()
+   Profile()
   ];
 
 // this is a list which contain titles to use in appbar //

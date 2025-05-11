@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 import 'api_consumer.dart';
@@ -23,6 +25,26 @@ class DioConsumer extends ApiConsumer {
             true)); // ,frgf, hghadhx dgd f]d d'fugd dhihبيراقب الريكويست والرسبونس بالاضافة لانو بيطبع بالكونسول
   }
   @override
+  Future put(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryparameters,
+    bool isFormData = false,
+  }) async {
+    try {
+      final response = await dio.put(
+        path,
+        data: isFormData ? FormData.fromMap(data) : data,
+        queryParameters: queryparameters,
+      );
+      return response.data;
+    } on DioException catch (e) {
+      handelDioExceptions(e);
+      rethrow; // للحفاظ على نفس النمط الموجود في دالة post
+    }
+  }
+
+  @override
   Future delete(String path,
       {dynamic data,
       Map<String, dynamic>? queryparameters,
@@ -31,7 +53,7 @@ class DioConsumer extends ApiConsumer {
       final response = await dio.delete(path,
           data: isFormData ? FormData.fromMap(data) : data,
           queryParameters: queryparameters);
-     // throw UnimplementedError();
+      // throw UnimplementedError();
       return response.data;
     } on DioException catch (e) {
       handelDioExceptions(e);
@@ -67,18 +89,30 @@ class DioConsumer extends ApiConsumer {
     }
   }
 
-  @override
-  Future post(String path,
-      {dynamic data,
-      Map<String, dynamic>? queryparameters,
-      bool isFormData = false}) async {
-    try {
-      final response = await dio.post(path,
-          data: isFormData ? FormData.fromMap(data) : data,
-          queryParameters: queryparameters);
-      return response.data;
-    } on DioException catch (e) {
-      handelDioExceptions(e);
-    }
+ 
+ 
+@override
+Future<dynamic> post(
+  String path, {
+  Object? data,
+  Map<String, dynamic>? queryparameters,
+  bool isFormData = false,
+  Options? options,
+}) async {
+  try {
+    final requestOptions = options ?? Options();
+    requestOptions.contentType = isFormData ? 'multipart/form-data' : 'application/json';
+
+    final response = await dio.post(
+      path,
+      data: data,
+      queryParameters: queryparameters,
+      options: requestOptions,
+    );
+    return response.data;
+  } on DioException catch (e) {
+    handelDioExceptions(e);
+    rethrow;
   }
+}
 }

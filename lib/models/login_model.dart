@@ -9,11 +9,11 @@ class LoginModel {
     required this.id,
   });
 
-  factory LoginModel.fromJson(Map<String, dynamic> jsonData) {
+  factory LoginModel.fromJson(Map<String, dynamic> jsonData) { final user = jsonData["user"];
     return LoginModel(
       message: jsonData["message"], // تأكد من الاسم الصحيح في الـ JSON
-      token: jsonData["token"],
-      id: jsonData["id"],
+      token: jsonData["access_token"],
+      id: user["id"],
     );
   }
 }

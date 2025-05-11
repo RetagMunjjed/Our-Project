@@ -26,8 +26,8 @@ class UserRepository {//لااشياء المكررة دوما
       final user = LoginModel.fromJson(response);
 
       // فك تشفير التوكن
-      final decodedToken = JwtDecoder.decode(user.token);
-      print(decodedToken['id']);
+      //final decodedToken = JwtDecoder.decode(user.token);
+     // print(decodedToken['id']);
 
       // حفظ البيانات في الكاش
       await CacheHelper.saveData(key: "token", value: user.token);
@@ -43,9 +43,10 @@ class UserRepository {//لااشياء المكررة دوما
   Future<Either<String, SignupModel>> signup({
   required String name,
   required String email,
+   required String phone,
   required String password,
-  required String confirmpassword,
-  required String phone,
+  required String password_confirmation,
+ 
 }) async {
   try {
     final response = await api.post(
@@ -54,13 +55,14 @@ class UserRepository {//لااشياء المكررة دوما
       data: {
         "name": name,
         "email": email,
+       "phone":phone,
         "password": password,
-        "confirmpassword": confirmpassword, 
-        "phone":phone,// انت كنت كاتبها confirmPassword بالغلط
+        "password_confirmation": password_confirmation, 
+       
       },
     );
 
-    final user = SignupModel.fromJson(response); // صححي fromjson إلى fromJson
+    final user = SignupModel.fromJson(response); 
     return Right(user);
   } on serverException catch (e) {
     return Left(e.errorModel.errorMessage);

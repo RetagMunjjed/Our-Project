@@ -9,14 +9,18 @@ class RegisterCubit extends Cubit<RegisterState> {
   RegisterCubit(this.userrepository) : super(RegisterInitial());
   //final ApiConsumer api;
   final UserRepository userrepository;
+
   //sign in from key
-  GlobalKey<FormState> loginFromKey = GlobalKey();
+ // GlobalKey<FormState> loginFromKey = GlobalKey();
+  // في الـ Cubit
+//GlobalKey<FormState> get loginFromKey => GlobalKey(); // إنشاء جديد في كل استدعاء
+    final GlobalKey<FormState> loginFromKey = GlobalKey<FormState>();
   //sign in email
   TextEditingController loginEmail = TextEditingController();
   TextEditingController loginPassword = TextEditingController();
   //sinup form key
   GlobalKey<FormState> signupFromKey = GlobalKey();
-  // XFile? profilepic; لتحميل الصورة
+  
   TextEditingController signUpName = TextEditingController();
   TextEditingController signupPhonNumber = TextEditingController();
   TextEditingController signupEmail = TextEditingController();
@@ -52,7 +56,7 @@ class RegisterCubit extends Cubit<RegisterState> {
         name: signUpName.text,
         email: signupEmail.text,
         password: signupPassword.text,
-        confirmpassword: confirmPassword.text,
+        password_confirmation: confirmPassword.text,
         phone: signupPhonNumber.text);
     response.fold(
       (errMasseg) => emit(Signupfailure(errMessage: errMasseg)),

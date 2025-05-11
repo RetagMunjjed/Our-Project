@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-// ... نفس الاستيرادات السابقة
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/register_cubit.dart';
 import 'bottomnavigation_bar.dart';
 import 'signup.dart';
 
 class Login extends StatefulWidget {
-  const Login({super.key});
+  Login({super.key});
+  //static const String name = '/login';
 
   @override
   State<Login> createState() => _LoginState();
@@ -14,17 +14,18 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool iscansee1 = false;
-  // var email_controller = TextEditingController();
-  // var password_controller = TextEditingController();
-  // var key_email = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    // احصل على أبعاد الشاشة
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return BlocConsumer<RegisterCubit, RegisterState>(
       listener: (context, state) {
         if (state is Loginsuccess) {
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Login successful!')));
+              .showSnackBar(const SnackBar(content: Text('Login successful!')));
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const MainScreen()),
@@ -40,12 +41,12 @@ class _LoginState extends State<Login> {
           appBar: AppBar(
             elevation: 5,
             shadowColor: Colors.indigo[900],
-            titleSpacing: 30,
+            titleSpacing: screenWidth * 0.07, // 7% من عرض الشاشة
             backgroundColor: Colors.deepOrange,
           ),
           body: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(screenWidth * 0.04), // 4% من عرض الشاشة
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -58,11 +59,10 @@ class _LoginState extends State<Login> {
                       color: Colors.deepOrange,
                     ),
                   ),
-                  const SizedBox(height: 70),
+                  SizedBox(height: screenHeight * 0.08), // 8% من ارتفاع الشاشة
                   Center(
                     child: Form(
                       key: context.read<RegisterCubit>().loginFromKey,
-
                       child: Column(
                         children: [
                           TextFormField(
@@ -79,37 +79,20 @@ class _LoginState extends State<Login> {
                                 color: Colors.indigo[900],
                                 fontWeight: FontWeight.bold,
                               ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 20, horizontal: 20),
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: screenHeight * 0.02,
+                                horizontal: screenWidth * 0.04,
+                              ),
                               prefixIcon: const Icon(Icons.email_outlined),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.red,
-                                  width: 3,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  width: 3,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.black, width: 3),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.deepOrange, width: 3),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              border: _buildInputBorder(),
+                              errorBorder: _buildInputBorder(isError: true),
+                              focusedErrorBorder: _buildInputBorder(),
+                              enabledBorder: _buildInputBorder(),
+                              focusedBorder: _buildInputBorder(isFocused: true),
                             ),
                             keyboardType: TextInputType.emailAddress,
                           ),
-                          const SizedBox(height: 25),
+                          SizedBox(height: screenHeight * 0.03),
                           TextFormField(
                             controller: context.read<RegisterCubit>().loginPassword,
                             validator: (value) {
@@ -126,9 +109,12 @@ class _LoginState extends State<Login> {
                               ),
                               prefixIcon: const Icon(Icons.password_outlined),
                               suffixIcon: IconButton(
-                                icon: iscansee1
-                                    ? const Icon(Icons.visibility_off_sharp)
-                                    : const Icon(Icons.visibility_sharp),
+                                icon: Icon(
+                                  iscansee1 
+                                    ? Icons.visibility_off_sharp 
+                                    : Icons.visibility_sharp,
+                                  size: screenWidth * 0.06, // 6% من عرض الشاشة
+                                ),
                                 onPressed: () {
                                   setState(() {
                                     iscansee1 = !iscansee1;
@@ -136,32 +122,15 @@ class _LoginState extends State<Login> {
                                 },
                               ),
                               suffixIconColor: Colors.indigo[800],
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 20, horizontal: 20),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.red,
-                                  width: 3,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: screenHeight * 0.02,
+                                horizontal: screenWidth * 0.04,
                               ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  width: 3,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.black, width: 3),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.deepOrange, width: 3),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              border: _buildInputBorder(),
+                              errorBorder: _buildInputBorder(isError: true),
+                              focusedErrorBorder: _buildInputBorder(),
+                              enabledBorder: _buildInputBorder(),
+                              focusedBorder: _buildInputBorder(isFocused: true),
                             ),
                             obscureText: !iscansee1,
                           ),
@@ -169,26 +138,27 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.02),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'If you don\'t have an account?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
-                          fontSize: 20,
+                          fontSize: screenWidth * 0.04, // 4% من عرض الشاشة
                           color: Colors.indigo[900],
                         ),
                       ),
-                      const SizedBox(width: 5),
+                      SizedBox(width: screenWidth * 0.02),
                       TextButton(
-                        child: const Text(
+                        child: Text(
                           'Register now',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontStyle: FontStyle.italic,
-                            fontSize: 20,
+                            fontSize: screenWidth * 0.04,
                             color: Colors.deepOrange,
                           ),
                         ),
@@ -203,24 +173,20 @@ class _LoginState extends State<Login> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 90),
+                  SizedBox(height: screenHeight * 0.1),
                   Center(
                     child: SizedBox(
-                      height: 50,
-                      width: 130,
+                      height: screenHeight * 0.07,
+                      width: screenWidth * 0.35,
                       child: FloatingActionButton(
                         onPressed: () {
-                          if (context.read().loginFromKey. currentState!.validate()) {
-                            // RegisterCubit.get(context).login(
-                            //   email: email_controller.text.trim(),
-                            //   password: password_controller.text.trim(),
-                            // );
+                          if (context.read<RegisterCubit>().loginFromKey.currentState!.validate()) {
                             context.read<RegisterCubit>().loginUser();
                           }
                         },
                         backgroundColor: Colors.deepOrange,
                         shape: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(screenWidth * 0.03),
                         ),
                         child: state is Loginloading
                             ? const CircularProgressIndicator(
@@ -229,7 +195,7 @@ class _LoginState extends State<Login> {
                             : Text(
                                 'Login',
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: screenWidth * 0.045,
                                   fontWeight: FontWeight.bold,
                                   fontStyle: FontStyle.italic,
                                   color: Colors.indigo[800],
@@ -244,6 +210,21 @@ class _LoginState extends State<Login> {
           ),
         );
       },
+    );
+  }
+
+  // دالة مساعدة لإنشاء حدود حقل الإدخال
+  OutlineInputBorder _buildInputBorder({bool isError = false, bool isFocused = false}) {
+    return OutlineInputBorder(
+      borderSide: BorderSide(
+        color: isError 
+          ? Colors.red 
+          : isFocused 
+            ? Colors.deepOrange 
+            : Colors.black,
+        width: 2,
+      ),
+      borderRadius: BorderRadius.circular(12),
     );
   }
 }

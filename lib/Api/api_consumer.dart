@@ -1,4 +1,11 @@
+import 'package:dio/dio.dart'; // هذه الحزمة تحتوي على فئة Options
 abstract class ApiConsumer {
+   Future put(String path, {
+    dynamic data,
+    Map<String, dynamic>? queryparameters,
+    bool isFormData = false,
+   
+  });
   Future<dynamic> get(
     String path, {
     Object? data,
@@ -9,6 +16,7 @@ abstract class ApiConsumer {
     Object? data,
     Map<String, dynamic>? queryparameters,
     bool isFormData = false,
+    Options? options,
   });
   Future<dynamic> patch(
     String path, {
