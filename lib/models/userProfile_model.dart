@@ -4,10 +4,9 @@ class UserProfileModel {
   final String email;
   final String? phone;
   final bool isAdmin;
-  String? image; // تغيير من final إلى قابل للتعديل
-  final String? bio;
-  final String? createdAt;
-  final String? updatedAt;
+  //String? image; // تغيير من final إلى قابل للتعديل
+  
+
   String? imageUrl; // تغيير من final إلى قابل للتعديل
   // إضافة حقول كلمة المرور والتأكيد (لن يتم تخزينها عادةً في هذا النموذج للقراءة فقط)
   final String? password;
@@ -19,10 +18,9 @@ class UserProfileModel {
     required this.email,
     this.phone,
     required this.isAdmin,
-    this.image,
-    this.bio,
-    this.createdAt,
-    this.updatedAt,
+    //this.image,
+    
+   
     this.imageUrl,
     this.password,
     this.passwordConfirmation,
@@ -35,10 +33,9 @@ class UserProfileModel {
       email: json['email'],
       phone: json['phone'],
       isAdmin: json['is_admin'] == 1,
-      image: json['image'],
-      bio: json['bio'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
+      //image: json['image'],
+    
+     
       imageUrl: json['image_url'],
       // لن يتم تضمين كلمة المرور وتأكيدها عادةً في بيانات المستخدم القادمة من الخادم
       // قم بتضمينها هنا فقط إذا كانت جزءًا من هيكل البيانات الذي تتعامل معه
@@ -55,10 +52,8 @@ class UserProfileModel {
       'email': email,
       'phone': phone,
       'is_admin': isAdmin ? 1 : 0,
-      'image': image,
-      'bio': bio,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
+      //'image': image,
+
       'image_url': imageUrl,
       // قم بتضمين كلمة المرور وتأكيدها هنا فقط إذا كنت سترسلهما إلى الخادم
       // 'password': password,

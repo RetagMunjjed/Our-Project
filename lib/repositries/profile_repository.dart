@@ -35,8 +35,8 @@ class ProfileRepository {
       final formData = FormData.fromMap({
         'name': name,
         'email': email,
-        if (phone != null) 'phone': phone,
-        if (bio != null) 'bio': bio,
+        // if (phone != null) 'phone': phone,
+       
         if (image != null) 'image': await MultipartFile.fromFile(image.path),
         if (oldPassword != null) 'old_password': oldPassword,
         if (newPassword != null) 'new_password': newPassword

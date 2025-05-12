@@ -29,8 +29,8 @@ class ProfileCubit extends Cubit<ProfileState> {
     required String name,
     required String email,
     String? phone,
-    String? bio,
-    File? image,
+    
+    File? image_url,
     String? oldPassword,
     String? newPassword,
   }) async {
@@ -39,8 +39,7 @@ class ProfileCubit extends Cubit<ProfileState> {
       name: name,
       email: email,
       phone: phone,
-      bio: bio,
-      image: image,
+      image: image_url,
       oldPassword: oldPassword, // أضف هذا
       newPassword: newPassword,
     );
@@ -51,7 +50,9 @@ class ProfileCubit extends Cubit<ProfileState> {
         user = data.user;
         emit(ProfileLoaded(data.user)); // إرسال الحالة الجديدة
         emit(ProfileUpdatedSuccessfully(data.message));
-
+      // انتظر قليلاً لإتاحة الوقت للسيرفر لتحديث البيانات
+      await Future.delayed(Duration(milliseconds: 500));
+      await fetchProfile();
         // إعادة تحميل البيانات بعد التحديث
         await fetchProfile();
       },

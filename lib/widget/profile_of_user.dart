@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/profile_cubit.dart';
 import 'edit_profile.dart';
+import 'dart:io';
 
 class Profile extends StatefulWidget {
   @override
@@ -13,98 +14,98 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    context.read<ProfileCubit>().fetchProfile(); // تحميل بيانات المستخدم
+    context.read<ProfileCubit>().fetchProfile();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColor.blue,
-        title: Text("Profile", style: TextStyle(color: Colors.white)),
-      ),
-      body: BlocListener<ProfileCubit, ProfileState>(
-        listener: (context, state) {
-          if (state is ProfileUpdatedSuccessfully) {
-            context.read<ProfileCubit>().fetchProfile(); // إعادة تحميل عند تلقي إشعار التحديث
+    return BlocConsumer<ProfileCubit, ProfileState>(
+      listener: (context, state) {
+        if (state is ProfileUpdatedSuccessfully || state is ProfileImageUpdated) {
+          context.read<ProfileCubit>().fetchProfile();
+        }
+      },
+      builder: (context, state) {
+        final cubit = context.read<ProfileCubit>();
+        final user = cubit.user;
+
+        if (user == null || state is ProfileLoading) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        ImageProvider? profileImage;
+        if (user.imageUrl != null) {
+          if (user.imageUrl!.startsWith('http')) {
+            profileImage = NetworkImage(user.imageUrl!);
+          } else {
+            // إزالة "file://" إذا كانت موجودة
+            final path = user.imageUrl!.replaceFirst('file://', '');
+            profileImage = FileImage(File(path));
           }
-        },
-        child: BlocBuilder<ProfileCubit, ProfileState>(
-          builder: (context, state) {
-            if (state is ProfileLoading) {
-              return Center(child: CircularProgressIndicator());
-            } else if (state is ProfileLoaded) {
-              final user = state.user;
+        }
 
-              return ListView(
-                padding: const EdgeInsets.all(16.0),
-                children: [
-                  Center(
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.grey[400],
-                      child: Icon(Icons.person, size: 80, color: Colors.white),
-                    ),
-                  ),
-                  SizedBox(height: 30),
-
-                  // Full Name
-                  Card(
-                    child: ListTile(
-                      leading: Icon(Icons.person, color: AppColor.blue),
-                      title: Text("Full Name"),
-                      subtitle: Text(user.name),
-                    ),
-                  ),
-
-                  // Email
-                  Card(
-                    child: ListTile(
-                      leading: Icon(Icons.email, color: AppColor.blue),
-                      title: Text("Email"),
-                      subtitle: Text(user.email),
-                    ),
-                  ),
-
-                  // Password (عرض ثابت غير حقيقي)
-                  Card(
-                    child: ListTile(
-                      leading: Icon(Icons.lock, color: AppColor.blue),
-                      title: Text("Password"),
-                      subtitle: Text("********"),
-                    ),
-                  ),
-
-                  // زر التعديل
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: MaterialButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      color: AppColor.blue,
-                      onPressed: () async {
-                        final shouldRefresh = await Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => Edit()),
-                        );
-                        
-                        if (shouldRefresh == true) {
-                          context.read<ProfileCubit>().fetchProfile();
-                        }
-                      },
-                      child: Text("Edit", style: TextStyle(color: Colors.white)),
-                    ),
-                  ),
-                ],
-              );
-            } else if (state is ProfileError) {
-              return Center(child: Text("Error: ${state.error}"));
-            } else {
-              return Center(child: Text("No data available."));
-            }
+        return RefreshIndicator(
+          onRefresh: () async {
+            await cubit.fetchProfile();
           },
-        ),
-      ),
+          child: ListView(
+            padding: const EdgeInsets.all(16.0),
+            children: [
+              Center(
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.grey[400],
+                  backgroundImage: profileImage,
+                  child: profileImage == null
+                      ? Icon(Icons.person, size: 80, color: Colors.white)
+                      : null,
+                ),
+              ),
+              SizedBox(height: 30),
+              Card(
+                child: ListTile(
+                  leading: Icon(Icons.person, color: AppColor.blue),
+                  title: Text("Full Name"),
+                  subtitle: Text(user.name),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: Icon(Icons.email, color: AppColor.blue),
+                  title: Text("Email"),
+                  subtitle: Text(user.email),
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: Icon(Icons.lock, color: AppColor.blue),
+                  title: Text("Password"),
+                  subtitle: Text("********"), // عرض مخفي لكلمة المرور
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: MaterialButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  color: AppColor.blue,
+                  onPressed: () async {
+                    final updated = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(builder: (context) => Edit()),
+                    );
+                    if (updated == true) {
+                      cubit.fetchProfile();
+                    }
+                  },
+                  child: Text("Edit", style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

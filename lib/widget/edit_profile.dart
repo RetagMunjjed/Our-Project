@@ -17,11 +17,12 @@ class _EditState extends State<Edit> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _emailController;
-  late TextEditingController _phoneController;
-  late TextEditingController _bioController;
   late TextEditingController _oldPasswordController;
   late TextEditingController _newPasswordController;
   late TextEditingController _confirmPasswordController;
+  bool _obscureOldPassword = true;
+  bool _obscureNewPassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void initState() {
@@ -29,8 +30,6 @@ class _EditState extends State<Edit> {
     final profile = context.read<ProfileCubit>().user;
     _nameController = TextEditingController(text: profile?.name);
     _emailController = TextEditingController(text: profile?.email);
-    _phoneController = TextEditingController(text: profile?.phone);
-    _bioController = TextEditingController(text: profile?.bio);
     _oldPasswordController = TextEditingController();
     _newPasswordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
@@ -40,8 +39,6 @@ class _EditState extends State<Edit> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
-    _bioController.dispose();
     _oldPasswordController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
@@ -71,9 +68,7 @@ class _EditState extends State<Edit> {
       context.read<ProfileCubit>().updateUserProfile(
             name: _nameController.text,
             email: _emailController.text,
-            phone: _phoneController.text,
-            bio: _bioController.text,
-            image: _image,
+            image_url: _image,
             oldPassword: _oldPasswordController.text.isNotEmpty
                 ? _oldPasswordController.text
                 : null,
@@ -97,7 +92,7 @@ class _EditState extends State<Edit> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
-            Navigator.pop(context, true);
+            Navigator. pop(context, true);
           } else if (state is ProfileImageUpdated) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('تم تحديث الصورة بنجاح')),
@@ -123,12 +118,12 @@ class _EditState extends State<Edit> {
                         backgroundColor: Colors.grey[300],
                         backgroundImage: _image != null
                             ? FileImage(_image!)
-                            : (context.read<ProfileCubit>().user?.image != null
+                            : (context.read<ProfileCubit>().user?.imageUrl != null
                                 ? NetworkImage(
-                                    context.read<ProfileCubit>().user!.image!)
+                                    context.read<ProfileCubit>().user!.imageUrl!)
                                 : null),
                         child: _image == null &&
-                                context.read<ProfileCubit>().user?.image == null
+                                context.read<ProfileCubit>().user?.imageUrl == null
                             ? const Icon(Icons.person,
                                 size: 60, color: Colors.white)
                             : null,
@@ -154,21 +149,65 @@ class _EditState extends State<Edit> {
                 _buildTextField(_nameController, "Full Name"),
                 const SizedBox(height: 16),
                 _buildTextField(_emailController, "Email"),
-                const SizedBox(height: 16),
-                _buildTextField(_phoneController, "Phone", optional: true),
-                const SizedBox(height: 16),
-                _buildTextField(_bioController, "Bio", optional: true, maxLines: 3),
                 const SizedBox(height: 30),
 
                 // Password Fields
                 _buildPasswordField(
-                    _oldPasswordController, "Old Password", isPassword: true),
+                  _oldPasswordController,
+                  "Old Password",
+                  obscureText: _obscureOldPassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureOldPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureOldPassword = !_obscureOldPassword;
+                      });
+                    },
+                  ),
+                ),
                 const SizedBox(height: 16),
                 _buildPasswordField(
-                    _newPasswordController, "New Password", isPassword: true),
+                  _newPasswordController,
+                  "New Password",
+                  obscureText: _obscureNewPassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureNewPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureNewPassword = !_obscureNewPassword;
+                      });
+                    },
+                  ),
+                ),
                 const SizedBox(height: 16),
-                _buildPasswordField(_confirmPasswordController,
-                    "Confirm Password", isPassword: true),
+                _buildPasswordField(
+                  _confirmPasswordController,
+                  "Confirm Password",
+                  obscureText: _obscureConfirmPassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirmPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      });
+                    },
+                  ),
+                ),
                 const SizedBox(height: 30),
 
                 // Save Button
@@ -223,11 +262,14 @@ class _EditState extends State<Edit> {
   }
 
   Widget _buildPasswordField(
-      TextEditingController controller, String label,
-      {bool isPassword = false}) {
+    TextEditingController controller,
+    String label, {
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
     return TextFormField(
       controller: controller,
-      obscureText: isPassword,
+      obscureText: obscureText,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(
@@ -242,7 +284,8 @@ class _EditState extends State<Edit> {
           borderSide: BorderSide(color: AppColor.pink),
           borderRadius: BorderRadius.circular(8),
         ),
-        prefixIcon: isPassword ? const Icon(Icons.lock) : null,
+        prefixIcon: const Icon(Icons.lock),
+        suffixIcon: suffixIcon,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     );
